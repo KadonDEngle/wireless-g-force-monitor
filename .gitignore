@@ -1,0 +1,29 @@
+# PlatformIO
+.pio/
+.pioenvs/
+.piolibdeps/
+
+# VS Code (machine-specific paths & IntelliSense)
+.vscode/
+
+# Arduino IDE / Compiled Binaries
+build/
+*.bin
+*.elf
+*.hex
+*.eep
+*.map
+*.o
+*.d
+*.a
+
+# OS & Editor Clutter (Windows, macOS, Vim)
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*.swo
+*~
+
+# Logs & Temp Data
+*.log
