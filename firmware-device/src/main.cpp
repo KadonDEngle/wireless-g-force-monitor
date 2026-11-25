@@ -71,10 +71,11 @@ void setup() {
     pAdvertising = NimBLEDevice::getAdvertising();
     pAdvertising->addServiceUUID(SERVICE_UUID);
     
-    // NimBLEAdvertisementData scanResponseData;
-    // scanResponseData.setName("Wireless G-Force Monitor");
-    // pAdvertising->setScanResponseData(scanResponseData);
-    pAdvertising->setName("Wireless G-Force Monitor");
+    // Put device name in scan response to avoid exceeding the 31-byte primary advertising packet limit
+    NimBLEAdvertisementData scanResponseData;
+    scanResponseData.setName("Wireless G-Force Monitor");
+    pAdvertising->setScanResponseData(scanResponseData);
+    // pAdvertising->setName("Wireless G-Force Monitor");
     pAdvertising->enableScanResponse(true);
 
     pAdvertising->start();
