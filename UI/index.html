@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document Title</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="scripts.js"></script>
+</head>
+<body>
+    <div class = "panel">
+        <div class="panelItem">
+            <h2 class="header">Expected G-force:</h2>
+            <h1 class="content" id="gForceCalculation">0.0</h1>
+        </div>
+        <div class="panelItem">
+            <h2 class="header">Measured G-force:</h2>
+            <h1 class="content" id="gForceReading">0.0</h1>
+        </div>
+        <div class="panelItem">
+            <h3 class="header">Sample Rate:</h3>
+            <h2 class="content" id="sampleRateReading">0.0</h2>
+        </div>
+        <div class="panelItem">
+            <h3 class="header">Current RPM:</h3>
+            <h2 class="content" id="rpmReading">0.0</h2>
+        </div>
+        <div class="panelItem">
+            <div style="display:flex; padding: 20px">
+                <h3 class="header">Set motor RPM: </h3>
+                <input id="rpmEntryBox" type="number" placeholder="RPM" value="0" step="0.1">
+                <button type="button" onclick="updateRpm()">Submit</button>
+            </div>
+
+        </div>
+        <button class="cssButton" onclick = "connect_BLE()">Connect Device</button>
+        <button class="cssButton" onclick = "connect_Port()">Open Port</button>
+    </div>
+</body>
+</html>

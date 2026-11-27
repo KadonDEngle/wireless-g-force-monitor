@@ -1,0 +1,45 @@
+body {
+    background-color: #232028;
+    display: flex;
+    justify-content: center;
+}
+
+.panel {
+    width:100%;
+    justify-content: center;
+    background-color: #232028;
+    padding: 20px;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+}
+
+.panelItem{
+    justify-content: center;
+    display: flex;
+}
+
+.header {
+    color:rgb(211, 211, 211);
+    margin: 10px;
+    align-content: center;
+}
+
+.content {
+    color: aliceblue
+}
+.cssButton {
+    background-color: #16171b;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: flex;
+    font-size: 16px;
+    cursor: pointer;
+    width: fit-content;
+    align-self: center;
+    margin: 10px;
+}
