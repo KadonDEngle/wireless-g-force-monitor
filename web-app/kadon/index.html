@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wireless G-Force Monitor</title>
+    <link rel="stylesheet" href="./src/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <header>
+        <div>
+            <h1>Wireless G-Force Monitor</h1>
+            <div class="subtitle">ECE 341 Junior Design Project</div>
+        </div>
+        <div class="controls">
+            <label class="rig-toggle" for="testRigToggle" title="Show or hide Test Rig verification features">
+                <input type="checkbox" id="testRigToggle">
+                <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
+                <span class="toggle-label">Test Rig</span>
+            </label>
+            <button id="connectSensorBtn">Connect Sensor (BLE)</button>
+            <button id="connectRigBtn" class="rig-btn">Connect Rig (USB)</button>
+        </div>
+    </header>
+
+    <!-- Distinctly Separated Control Sections: Sensor Controls vs. Test Rig Controls -->
+    <section class="controls-split">
+        <div class="control-panel sensor-panel">
+            <div class="panel-title-row">
+                <span class="section-tag sensor-tag">Sensor Controls</span>
+                <span id="sensorStatus" class="badge">Disconnected</span>
+            </div>
+            <div class="controls sensor-actions-row">
+                <button id="pauseGraphBtn" class="secondary">Pause Graph</button>
+                <button id="resetGraphBtn" class="secondary">Reset Graph</button>
+            </div>
+        </div>
+
+        <div id="rigControlPanel" class="control-panel rig-panel">
+            <div class="panel-title-row">
+                <span class="section-tag rig-tag">Test Rig Controls</span>
+                <div class="status-pills">
+                    <span id="rigStatus" class="badge">Disconnected</span>
+                </div>
+            </div>
+
+            <div class="rig-controls-grid">
+                <div class="controls">
+                    <div class="input-group">
+                        <label for="radiusInput">Radius (mm)</label>
+                        <input type="number" id="radiusInput" value="150" step="0.5" min="1">
+                    </div>
+                    <div class="input-group">
+                        <label for="targetRpmInput">RPM</label>
+                        <input type="number" id="targetRpmInput" value="0" step="10" min="0">
+                        <button id="sendRpmBtn" class="rig-btn" disabled title="Connect USB test rig to send speed">Send Speed</button>
+                    </div>
+                </div>
+
+                <div class="controls test-actions-row">
+                    <button id="startRecBtn" class="btn-start">Start Test</button>
+                    <button id="stopRecBtn" class="secondary" disabled>Stop Test</button>
+                    <button id="clearTestBtn" class="secondary" disabled>Clear Results</button>
+                    <span id="rpmSendFeedback" class="rpm-feedback">Manual RPM preview (USB disconnected)</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Distinctly Separated Telemetry Readouts: Sensor Data vs. Test Rig Data -->
+    <section class="telemetry-split">
+        <div class="telemetry-group sensor-group">
+            <div class="group-heading sensor-heading">Sensor Data</div>
+            <div class="card sensor-card">
+                <div class="card-label">Measured Acceleration</div>
+                <div class="card-value"><span id="measG">0.00</span> G</div>
+                <div class="card-sub"><span id="measMs2">0.00</span> m/s² &bull; Peak: <span id="peakG">0.00</span> G</div>
+            </div>
+        </div>
+
+        <div id="rigDataGroup" class="telemetry-group verification-group">
+            <div class="group-heading rig-heading">Test Rig Data</div>
+            <div class="verification-cards">
+                <div class="card rig-card">
+                    <div class="card-label">Expected Acceleration</div>
+                    <div class="card-value expected"><span id="expG">0.00</span> G</div>
+                    <div class="card-sub"><span id="expMs2">0.00</span> m/s² @ <span id="liveRpm">0</span> RPM</div>
+                </div>
+
+                <div class="card rig-card">
+                    <div class="card-label">Instantaneous Error</div>
+                    <div class="card-value"><span id="errPct">--</span></div>
+                    <div class="card-sub">|ΔG|: <span id="deltaG">0.000</span> G</div>
+                </div>
+
+                <div class="card rig-card">
+                    <div class="card-label">Test Average Error</div>
+                    <div class="card-value"><span id="avgErrPct">--</span></div>
+                    <div class="card-sub">Avg |ΔG|: <span id="avgDeltaG">--</span> G &bull; <span id="elapsedTime">0.00</span> s</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Primary Graph: Sensor Measured vs. Rig Expected (Full Extent) -->
+    <section class="panel">
+        <div class="panel-header">
+            <h2 id="primaryChartTitle">Sensor Acceleration vs. Rig Expected</h2>
+        </div>
+        <div class="chart-canvas-wrap">
+            <canvas id="validationChart"></canvas>
+        </div>
+    </section>
+
+    <!-- Error Over Extent of Test Graph -->
+    <section id="errorChartPanel" class="panel">
+        <div class="panel-header">
+            <h2>Error Over Extent of Test</h2>
+            <div class="error-summary-pills">
+                <span class="summary-pill">Mean Error: <strong id="summaryMeanErr">--</strong></span>
+                <span class="summary-pill">Mean |ΔG|: <strong id="summaryMeanDelta">--</strong></span>
+                <span class="summary-pill">Min / Max: <strong id="summaryMinMaxErr">--</strong></span>
+                <span class="summary-pill">Valid Samples: <strong id="summaryValidCount">0</strong></span>
+            </div>
+        </div>
+        <div class="chart-canvas-wrap chart-canvas-sm">
+            <canvas id="errorChart"></canvas>
+        </div>
+    </section>
+
+    <!-- Accumulated Test Results Table -->
+    <section id="resultsTablePanel" class="panel">
+        <div class="panel-header">
+            <h2>Accumulated Test Results</h2>
+            <span id="tableRowCount" class="badge">0 samples</span>
+        </div>
+        <div id="tableScrollContainer" class="table-scroll">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Time (s)</th>
+                        <th>RPM</th>
+                        <th>Radius (mm)</th>
+                        <th>Expected (G)</th>
+                        <th>Sensor (G)</th>
+                        <th>|ΔG| (G)</th>
+                        <th>Error (%)</th>
+                        <th>Running Avg (%)</th>
+                    </tr>
+                </thead>
+                <tbody id="recordedTableBody">
+                    <tr id="emptyTableRow">
+                        <td colspan="9" class="empty-state">Press "Start Test" to accumulate verification samples.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <footer class="app-footer">
+        <svg class="ai-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12 2L14.8 9.2L22 12L14.8 14.8L12 22L9.2 14.8L2 12L9.2 9.2L12 2Z" />
+        </svg>
+        <span>Generated by Gemini &bull; Designed by Kadon Engle</span>
+    </footer>
+
+    <script type="module" src="./src/main.js"></script>
+</body>
+</html>
