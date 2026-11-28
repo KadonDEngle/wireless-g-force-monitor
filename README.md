@@ -3,7 +3,7 @@
 # Wireless G-Force Monitor
 
 **ECE 341 — Junior Design Final Project | Oregon State University**  
-Kadon Engle • Nolan Kessler • Jonathan Fiorini
+Kadon Engle • Nolan Kessler • Wolfy Fiorini
 
 [Web App & Live Telemetry ↓](#-web-application) • [CAD & Drawings ↓](#cad--mechanical-drawings) • [Architecture ↓](#-system-architecture)
 
@@ -71,5 +71,5 @@ The browser-based dashboard uses the **Web Bluetooth API** to plot and record re
 > The Web Bluetooth and Web Serial APIs require **Google Chrome** or **Microsoft Edge** on a Bluetooth-capable host computer, and require the physical hardware to stream live data.
 
 Two web interfaces are hosted via the selector page:
-- **Interface A** (`/jonathan`) — Hand-coded by Jonathan Fiorini.
+- **Interface A** (`/wolfy`) — Hand-coded by Wolfy Fiorini.
 - **Interface B** (`/kadon`) — AI-assisted, developed by Kadon Engle.
