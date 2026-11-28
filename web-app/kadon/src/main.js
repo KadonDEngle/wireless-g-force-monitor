@@ -137,18 +137,10 @@ function setRpmFeedback(message, tone = '') {
     els.rpmSendFeedback.className = tone ? `rpm-feedback ${tone}` : 'rpm-feedback';
 }
 
-els.radiusInput.addEventListener('input', updateExpectedDisplay);
-
-els.targetRpmInput.addEventListener('input', () => {
+function getTargetRpmFromInput() {
     const parsed = parseFloat(els.targetRpmInput.value);
-    const rpm = Number.isFinite(parsed) && parsed >= 0 ? parsed : 0;
-    state.targetRigRpm = rpm;
-
-    if (!state.rigConnected) {
-        state.currentRigRpm = rpm;
-        updateExpectedDisplay();
-    }
-});
+    return Number.isFinite(parsed) && parsed >= 0 ? parsed : 0;
+}
 
 const serialRig = initSerialRig({
     onConnectionChange: (connected) => {
@@ -156,8 +148,9 @@ const serialRig = initSerialRig({
         if (connected) {
             setRpmFeedback('USB connected. Set RPM and press Send Speed.', 'sent');
         } else {
-            const parsed = parseFloat(els.targetRpmInput.value);
-            state.currentRigRpm = Number.isFinite(parsed) && parsed >= 0 ? parsed : 0;
+            const rpm = getTargetRpmFromInput();
+            state.targetRigRpm = rpm;
+            state.currentRigRpm = rpm;
             updateExpectedDisplay();
             setRpmFeedback('Manual RPM preview (USB disconnected)');
         }
@@ -168,9 +161,20 @@ const serialRig = initSerialRig({
     },
 });
 
+els.radiusInput.addEventListener('input', updateExpectedDisplay);
+
+els.targetRpmInput.addEventListener('input', () => {
+    const rpm = getTargetRpmFromInput();
+    state.targetRigRpm = rpm;
+
+    if (!serialRig.isConnected()) {
+        state.currentRigRpm = rpm;
+        updateExpectedDisplay();
+    }
+});
+
 async function handleSendRpm() {
-    const parsed = parseFloat(els.targetRpmInput.value);
-    const rpm = Number.isFinite(parsed) && parsed >= 0 ? parsed : 0;
+    const rpm = getTargetRpmFromInput();
     els.targetRpmInput.value = String(rpm);
     state.targetRigRpm = rpm;
 
@@ -183,8 +187,6 @@ async function handleSendRpm() {
     try {
         const sent = await serialRig.sendRpm(rpm);
         if (sent) {
-            state.currentRigRpm = rpm;
-            updateExpectedDisplay();
             setRpmFeedback(`Sent ${rpm} RPM to rig`, 'sent');
         } else {
             setRpmFeedback('Failed to write speed to rig.', 'warn');
