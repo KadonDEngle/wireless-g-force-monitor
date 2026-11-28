@@ -2,7 +2,7 @@ export const CONFIG = {
     SENSOR_DEVICE_NAME: 'Wireless G-Force Monitor',
     SERVICE_UUID: '4fafc201-1fb5-459e-8fcc-c5c9c331914b',
     CHARACTERISTIC_UUID: 'beb5483e-36e1-4688-b7f5-ea07361b26a8',
-    SERIAL_BAUD_RATE: 115200,
+    SERIAL_BAUD_RATE: 9600,
     SAMPLE_INTERVAL_MS: 10,
     GRAVITY: 9.81,
 };
